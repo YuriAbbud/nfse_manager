@@ -1,0 +1,66 @@
+<!-- templates/core/nota_form.html -->
+{% extends 'base.html' %}
+
+{% block titulo %}{{ titulo }} — NFS-e Manager{% endblock %}
+
+{% block conteudo %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-file-earmark-plus me-2"></i>{{ titulo }}
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for erro in field.errors %}{{ erro }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                    <!-- Preview do ISS em tempo real -->
+                    <div class="alert alert-success py-2 mb-3" id="previewIss" style="display:none;">
+                        <small><strong>ISS estimado (5%):</strong> R$ <span id="valorIss">0,00</span></small>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-verde">
+                            <i class="bi bi-check-lg me-1"></i>Emitir Nota
+                        </button>
+                        <a href="{% url 'nota_lista' %}" class="btn btn-outline-secondary">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Preview do ISS em tempo real conforme o usuário digita o valor
+    const campoValor = document.getElementById('id_valor_bruto');
+    const preview    = document.getElementById('previewIss');
+    const spanIss    = document.getElementById('valorIss');
+
+    campoValor.addEventListener('input', () => {
+        const valor = parseFloat(campoValor.value);
+        if (!isNaN(valor) && valor > 0) {
+            spanIss.textContent = (valor * 0.05).toFixed(2).replace('.', ',');
+            preview.style.display = 'block';
+        } else {
+            preview.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}
