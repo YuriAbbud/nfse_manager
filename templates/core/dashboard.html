@@ -1,0 +1,87 @@
+<!-- templates/core/dashboard.html -->
+{% extends 'base.html' %}
+
+{% block titulo %}Dashboard — NFS-e Manager{% endblock %}
+
+{% block conteudo %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-speedometer2 me-2"></i>Dashboard</h4>
+    <a href="{% url 'nota_criar' %}" class="btn btn-verde">
+        <i class="bi bi-plus-lg me-1"></i>Emitir Nota
+    </a>
+</div>
+
+<!-- Cards de resumo -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card card-dashboard card-verde shadow p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="mb-1 opacity-75">Faturamento Total</p>
+                    <h3 class="fw-bold mb-0">R$ {{ faturamento_total|floatformat:2 }}</h3>
+                </div>
+                <i class="bi bi-currency-dollar fs-1 opacity-50"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card card-dashboard card-verde shadow p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="mb-1 opacity-75">Total de ISS (5%)</p>
+                    <h3 class="fw-bold mb-0">R$ {{ total_iss|floatformat:2 }}</h3>
+                </div>
+                <i class="bi bi-percent fs-1 opacity-50"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card card-dashboard card-verde shadow p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="mb-1 opacity-75">Total de Notas</p>
+                    <h3 class="fw-bold mb-0">{{ total_notas }}</h3>
+                </div>
+                <i class="bi bi-file-earmark-text fs-1 opacity-50"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Últimas notas -->
+<div class="card shadow-sm">
+    <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-clock-history me-2"></i>Últimas Notas Emitidas
+    </div>
+    <div class="card-body p-0">
+        {% if ultimas_notas %}
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Cliente</th>
+                        <th>Valor</th>
+                        <th>ISS</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for nota in ultimas_notas %}
+                    <tr>
+                        <td class="text-muted">{{ nota.pk }}</td>
+                        <td>{{ nota.cliente.nome }}</td>
+                        <td>R$ {{ nota.valor_bruto|floatformat:2 }}</td>
+                        <td>R$ {{ nota.valor_iss|floatformat:2 }}</td>
+                        <td>{{ nota.emitida_em|date:"d/m/Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-muted text-center py-4">Nenhuma nota emitida ainda.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

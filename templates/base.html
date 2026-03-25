@@ -1,0 +1,176 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}NFS-e Manager{% endblock %}</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        /* ── Cores principais inspiradas no Emissor Nacional ── */
+        :root {
+            --verde-principal: #2e7d32;
+            --verde-claro:     #43a047;
+            --verde-hover:     #1b5e20;
+        }
+
+        body {
+            background-color: #f8f9fa;
+        }
+
+        /* Navbar */
+        .navbar-nfse {
+            background-color: var(--verde-principal);
+        }
+
+        .navbar-nfse .navbar-brand,
+        .navbar-nfse .nav-link {
+            color: #fff !important;
+        }
+
+        .navbar-nfse .nav-link:hover {
+            color: #c8e6c9 !important;
+        }
+
+        .navbar-nfse .nav-link.active {
+            font-weight: 600;
+            border-bottom: 2px solid #fff;
+        }
+
+        /* Cards do dashboard */
+        .card-dashboard {
+            border: none;
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+
+        .card-dashboard:hover {
+            transform: translateY(-4px);
+        }
+
+        .card-verde {
+            background: linear-gradient(135deg, var(--verde-principal), var(--verde-claro));
+            color: #fff;
+        }
+
+        /* Botões verdes */
+        .btn-verde {
+            background-color: var(--verde-principal);
+            border-color: var(--verde-principal);
+            color: #fff;
+        }
+
+        .btn-verde:hover {
+            background-color: var(--verde-hover);
+            border-color: var(--verde-hover);
+            color: #fff;
+        }
+
+        /* Dark mode overrides */
+        [data-bs-theme="dark"] body {
+            background-color: #1a1a2e;
+        }
+
+        [data-bs-theme="dark"] .navbar-nfse {
+            background-color: #1b5e20;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ── NAVBAR ── -->
+    <nav class="navbar navbar-expand-lg navbar-nfse shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-5" href="{% url 'dashboard' %}">
+                <i class="bi bi-receipt-cutoff me-2"></i>NFS-e Manager
+            </a>
+
+            <button class="navbar-toggler border-light" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+                           href="{% url 'dashboard' %}">
+                            <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'cliente' in request.resolver_match.url_name %}active{% endif %}"
+                           href="{% url 'cliente_lista' %}">
+                            <i class="bi bi-people me-1"></i>Clientes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'nota' in request.resolver_match.url_name %}active{% endif %}"
+                           href="{% url 'nota_lista' %}">
+                            <i class="bi bi-file-earmark-text me-1"></i>Notas Fiscais
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Botão Dark Mode -->
+                <button class="btn btn-outline-light btn-sm" id="btnDarkMode" title="Alternar tema">
+                    <i class="bi bi-moon-fill" id="iconeTema"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ── MENSAGENS (success / error) ── -->
+    <div class="container mt-3">
+        {% for msg in messages %}
+            <div class="alert alert-{{ msg.tags }} alert-dismissible fade show" role="alert">
+                {{ msg }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- ── CONTEÚDO PRINCIPAL ── -->
+    <main class="container my-4">
+        {% block conteudo %}{% endblock %}
+    </main>
+
+    <!-- ── FOOTER ── -->
+    <footer class="text-center text-muted py-3 mt-auto border-top">
+        <small>NFS-e Manager &copy; 2025 — Projeto Acadêmico</small>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Dark Mode Script -->
+    <script>
+        const html       = document.documentElement;
+        const btn        = document.getElementById('btnDarkMode');
+        const icone      = document.getElementById('iconeTema');
+        const CHAVE      = 'nfse_tema';
+
+        // Aplica o tema salvo ao carregar a página
+        function aplicarTema(tema) {
+            html.setAttribute('data-bs-theme', tema);
+            icone.className = tema === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+        }
+
+        aplicarTema(localStorage.getItem(CHAVE) || 'light');
+
+        // Alterna ao clicar
+        btn.addEventListener('click', () => {
+            const novoTema = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+            localStorage.setItem(CHAVE, novoTema);
+            aplicarTema(novoTema);
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>
